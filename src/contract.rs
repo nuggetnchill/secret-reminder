@@ -41,7 +41,8 @@ pub fn handle<S: Storage, A: Api, Q: Querier>(
         HandleMsg::Read { } => try_read(deps, env),
     }
 }
-// try_record 
+
+// fn try_record for fn handle 
 fn try_record<S: Storage, A: Api, Q: Querier>(
     deps: &mut Extern<S, A, Q>,
     env: Env,
@@ -81,7 +82,7 @@ fn try_record<S: Storage, A: Api, Q: Querier>(
     })  
 }
 
-// try_read
+// fn try_read for fn handle
 fn try_read<S: Storage, A: Api, Q: Querier>(
     deps: &mut Extern<S, A, Q>,
     env: Env,
@@ -121,6 +122,12 @@ pub fn query<S: Storage, A: Api, Q: Querier>(
     msg: QueryMsg,
 ) -> StdResult<Binary> {
     match msg {
-        // add query execution code here
+        QueryMsg::Stats { } => query_stats(deps)
     }
+}
+
+fn query_stats<S: Storage, A: Api, Q: Querier>(deps: &Extern<S, A, Q>) -> StdResult<Binary> {
+    // retrieve the config state from storage
+    let config: State = load(&dep.storage, CONFIG_KEY)?;
+    to_binary(&QueryAnswer::Stats{ reminder_count: config.reminder_count })
 }
