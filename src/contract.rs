@@ -41,7 +41,7 @@ pub fn handle<S: Storage, A: Api, Q: Querier>(
         HandleMsg::Read { } => try_read(deps, env),
     }
 }
-
+// try_record 
 fn try_record<S: Storage, A: Api, Q: Querier>(
     deps: &mut Extern<S, A, Q>,
     env: Env,
@@ -65,7 +65,7 @@ fn try_record<S: Storage, A: Api, Q: Querier>(
             content: reminder.to_vec(),
             timestamp: env.block.time
         };
-        // save the reminder using a byte vectore respresentation of the sender's address as the key
+        // save the reminder using a byte vector respresentation of the sender's address as the key
         save(&mut deps.storage, &sender_address.as_slice().to_vec(), &stored_reminder)?;
 
         //increment the reminder_count
@@ -77,6 +77,41 @@ fn try_record<S: Storage, A: Api, Q: Querier>(
         log: vec![],
         data: Some(to_binary(&HandleAnswer::Record{
             status,
+        })?),
+    })  
+}
+
+// try_read
+fn try_read<S: Storage, A: Api, Q: Querier>(
+    deps: &mut Extern<S, A, Q>,
+    env: Env,
+) -> StdResult<HandleResponse> {
+    let status : String;
+    let mut reminder: Option<String> = None;
+    let mut timestamp: Option<u64> = None;
+
+    let sender_address = deps.api.canonical_address(&env.message.sender)?;
+
+    // read the reminder from storage
+    let result: Option<Reminder> = may_load(&mut deps.storage, &sender_address.as_slice().to_vec()).ok().unwrap();
+    match result {
+        // set all response field values
+        Some(stored_reminder) => {
+            status = String::from("Reminder found.");
+            reminder = String::from_utf8(stored_reminder.content).ok();
+            timestamp = Some(stored_reminder.timestamp);
+        }
+        // unless there's an error
+        None => { status = String::from("Reminder not found");}
+        
+    }
+    Ok(HandleResponse {
+        messages: vec![],
+        log: vec![],
+        data: Some(to_binary(&HandleAnswer::Read {
+            status,
+            reminder,
+            timestamp,
         })?),
     })
 }
