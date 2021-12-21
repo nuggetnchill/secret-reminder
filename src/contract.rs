@@ -72,14 +72,19 @@ fn try_record<S: Storage, A: Api, Q: Querier>(
         //increment the reminder_count
         config.reminder_count += 1;
         save(&mut deps.storage, CONFIG_KEY, &config)?;
+
+        //set the status message
+        status = String::from("Reminder recorded!");
     }
+
+    // Return a HandleResponse with the appropriate status message included in the data field
     Ok(HandleResponse {
         messages: vec![],
         log: vec![],
-        data: Some(to_binary(&HandleAnswer::Record{
+        data: Some(to_binary(&HandleAnswer::Record {
             status,
         })?),
-    })  
+    })
 }
 
 // fn try_read for fn handle
@@ -128,6 +133,6 @@ pub fn query<S: Storage, A: Api, Q: Querier>(
 
 fn query_stats<S: Storage, A: Api, Q: Querier>(deps: &Extern<S, A, Q>) -> StdResult<Binary> {
     // retrieve the config state from storage
-    let config: State = load(&dep.storage, CONFIG_KEY)?;
+    let config: State = load(&deps.storage, CONFIG_KEY)?;
     to_binary(&QueryAnswer::Stats{ reminder_count: config.reminder_count })
 }

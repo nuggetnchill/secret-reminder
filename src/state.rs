@@ -20,6 +20,7 @@ pub struct Reminder {
 
 pub fn save<T: Serialize, S: Storage>(storage: &mut S, key: &[u8],value: &T) -> StdResult<()> {
     storage.set(key, &Bincode2::serialize(value)?);
+    Ok(())
 }
 
 pub fn load<T: DeserializeOwned, S: ReadonlyStorage>(storage: &S, key: &[u8]) -> StdResult<T> {

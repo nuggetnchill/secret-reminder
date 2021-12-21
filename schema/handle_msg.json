@@ -5,31 +5,30 @@
     {
       "type": "object",
       "required": [
-        "increment"
+        "record"
       ],
       "properties": {
-        "increment": {
-          "type": "object"
+        "record": {
+          "type": "object",
+          "required": [
+            "reminder"
+          ],
+          "properties": {
+            "reminder": {
+              "type": "string"
+            }
+          }
         }
       }
     },
     {
       "type": "object",
       "required": [
-        "reset"
+        "read"
       ],
       "properties": {
-        "reset": {
-          "type": "object",
-          "required": [
-            "count"
-          ],
-          "properties": {
-            "count": {
-              "type": "integer",
-              "format": "int32"
-            }
-          }
+        "read": {
+          "type": "object"
         }
       }
     }

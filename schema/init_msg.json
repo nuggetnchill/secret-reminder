@@ -3,10 +3,10 @@
   "title": "InitMsg",
   "type": "object",
   "required": [
-    "count"
+    "max_size"
   ],
   "properties": {
-    "count": {
+    "max_size": {
       "type": "integer",
       "format": "int32"
     }
