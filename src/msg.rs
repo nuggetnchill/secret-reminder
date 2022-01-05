@@ -38,9 +38,15 @@ impl QueryMsg {
 #[derive(Serialize, Deserialize, Debug, JsonSchema)]
 #[serde(rename_all = "snake_case")]
 pub enum HandleAnswer {
-    Record  { status: String },
-    Read { status: String, reminder: Option<String>, timestamp: Option<u64> },
-    GenerateViewingKey { key: ViewingKey },
+    Record  { 
+        status: String
+     },
+    Read {
+        status: String, reminder: Option<String>, timestamp: Option<u64> 
+    },
+    GenerateViewingKey { 
+        key: ViewingKey 
+    },
 }
 
 /// Responses from query function

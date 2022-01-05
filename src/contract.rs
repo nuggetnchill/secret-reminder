@@ -219,3 +219,52 @@ fn query_stats<S: Storage, A: Api, Q: Querier>(deps: &Extern<S, A, Q>) -> StdRes
     let config: State = load(&deps.storage, CONFIG_KEY)?;
     to_binary(&QueryAnswer::Stats{ reminder_count: config.reminder_count })
 }
+
+#[cfg(test)]
+mod tests {
+
+    use super::*;
+    use cosmwasm_std::testing::{mock_dependencies, mock_env};
+    use cosmwasm_std::{coins, from_binary};
+    use crate::msg::{InitMsg};
+
+    #[test]
+    fn test_record() {
+        let mut deps = mock_dependencies(20, &[]);
+
+        let msg = InitMsg {max_size:690, prng_seed:String::from("lets init bro")};
+        let env = mock_env("creator", &coins(1000, "earth"));
+        let _res = init(&mut deps, env, msg).unwrap();
+
+        // record new reminder
+        let env = mock_env("anyone", &coins(2, "token"));
+        let msg = HandleMsg::Record { reminder: String::from("drink more water") };
+        let _res = handle(&mut deps, env, msg).unwrap();
+
+        // record new reminder
+        let env = mock_env("anyone", &coins(2, "token"));
+        let msg = HandleMsg::Record { reminder: String::from("deposit to pepe credit union") };
+        let _res = handle(&mut deps, env, msg).unwrap();
+
+        let env = mock_env("anyone", &[]);
+        let create_vk_msg = HandleMsg::GenerateViewingKey {
+            entropy: "supbro".to_string(),
+            padding: None,
+        };
+        let handle_response = handle(&mut deps, env, create_vk_msg).unwrap();
+        let vk = match from_binary(&handle_response.data.unwrap()).unwrap() {
+            HandleAnswer::GenerateViewingKey { key } => {
+                println!("viewing key here: {}",key);
+                key
+            },
+            _ => panic!("Unexpected result from handle"),
+        };
+
+        let msg = QueryMsg::Read {address: HumanAddr("anyone".to_string()), key: vk.to_string()};
+        let query_result = query(&deps, msg).unwrap();
+        // println!("result?: {:?}", from_binary::<String>(&res));
+        let query_answer:QueryAnswer = from_binary(&query_result).unwrap();
+        println!("{:?}", query_answer);
+
+    }
+}
